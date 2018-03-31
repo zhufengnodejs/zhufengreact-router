@@ -2,7 +2,7 @@ let path = require('path');
 let HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
   //指定入口文件
-  entry: './src/index.js',
+  entry: './src.1/index.js',
   //指定输出的位置
   output: {
     //输出的路径，必须放一个绝对路径

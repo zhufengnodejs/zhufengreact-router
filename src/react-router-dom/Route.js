@@ -3,37 +3,48 @@ import PropTypes from 'prop-types';
 import pathToRegexp from 'path-to-regexp';
 export default class Route extends Component{
 	static contextTypes={
-		location: PropTypes.object
+		location: PropTypes.object,
+		history:PropTypes.object
 	}
 	constructor(props) {
 		super(props);
-		let {path,component}=props;
-		this.path=path;
-		this.component=component;
 		this.keys=[];
-		this.regexp=pathToRegexp(path,this.keys);
+		this.regexp=pathToRegexp(props.path,this.keys);
 	}
 	render() {
 		let self=this;
+		let {path,component:Component,render,children}=this.props;
 		let {location}=self.context;//得到路径
 		let result=location.pathname.match(self.regexp);
+		let props={
+			location,
+			history:this.context.history
+		}
 		if (result) {
 			let [url,...values]=result;
 			let match={
 				url,
-				path: self.path,
+				path,
 				params: self.keys.reduce((memo,key,index) => {
 					memo[key.name]=values[index];
 					return memo;
 				},{})
 			}
-			let _component=self.component;
-			let props={
-				location,
-				match
+			props.match=match;
+			if (render) {
+				return render(props);
+			} else if (Component) {
+				return <Component {...props}/>;
+			} else if (children) {
+				return children(props);
+			}else {
+				return null;
 			}
-			return <_component {...props}/>;
+			
+		} else if (children) {
+			return children(props);
+		} else {
+			return null;
 		}
-		return null;
 	}
 }
